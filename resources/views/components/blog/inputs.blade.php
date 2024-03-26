@@ -3,7 +3,6 @@
 @error('title')
 <p style="color: #a90707">{{ $message }}</p>
 @enderror
-<input name="cover" type="hidden" value="cover">
 <textarea name="description" id="description" placeholder="DESCRIPTION">{{ old('description', $post->description ?? '') }}</textarea>
 @error('description')
 <p style="color: #a90707">{{ $message }}</p>
@@ -12,3 +11,5 @@
 @error('body')
 <p style="color: #a90707">{{ $message }}</p>
 @enderror
+
+

@@ -11,6 +11,9 @@ Route::resource('posts', Web\PostController::class);
 Route::resource('comments', Web\CommentController::class)
     ->only(['store', 'update', 'destroy'])->middleware('auth');
 
+Route::post('subscriptions', [Web\SubscriptionController::class, 'store'])->name('subscriptions.store');
+Route::delete('subscriptions', [Web\SubscriptionController::class, 'destroy'])->name('subscriptions.destroy');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
