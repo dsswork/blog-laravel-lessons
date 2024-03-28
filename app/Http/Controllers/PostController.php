@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Post\StoreRequest;
 use App\Http\Requests\Post\UpdateRequest;
 use App\Http\Requests\Tag\IdArrayRequest;
-use App\Jobs\Mail\SendMailNewPost;
 use App\Models\Post;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
@@ -23,11 +23,15 @@ class PostController extends Controller implements HasMiddleware
         ];
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
         $posts = Post::query()
             ->with('category', 'tags', 'user')
-            ->paginate(4);
+            ->byCategory($request->category)
+            ->byTag($request->tag)
+            ->search($request->s)
+            ->paginate(4)
+            ->withQueryString();
 
         return view('posts.index', compact('posts'));
     }
@@ -49,12 +53,6 @@ class PostController extends Controller implements HasMiddleware
 
         $post = Post::query()->create($validated);
         $post->tags()->attach($tagsRequest->tags);
-
-        $readers = $post->user->readers()->get();
-
-        foreach($readers as $reader) {
-            SendMailNewPost::dispatch();
-        }
 
         return to_route('posts.show', compact('post'));
     }
